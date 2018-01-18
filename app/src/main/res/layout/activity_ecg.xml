@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="in.ashnehete.healthset.activites.EcgActivity">
+
+    <com.androidplot.xy.XYPlot
+        android:id="@+id/plotEcg"
+        style="@style/APDefacto.Light"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:renderMode="use_background_thread"
+        app:title="ECG" />
+
+</android.support.constraint.ConstraintLayout>
