@@ -66,7 +66,7 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     private void toMainActivity() {
-        Intent intent = new Intent(LauncherActivity.this, EcgActivity.class);
+        Intent intent = new Intent(LauncherActivity.this, MainActivity.class);
         startActivity(intent);
         finish();
     }

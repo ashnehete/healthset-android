@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,6 +16,8 @@ import com.androidplot.xy.AdvancedLineAndPointRenderer;
 import com.androidplot.xy.BoundaryMode;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
+import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
+import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -27,27 +28,19 @@ import java.util.StringTokenizer;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import in.ashnehete.healthset.R;
-import in.ashnehete.healthset.services.EcgBluetoothService;
 import in.ashnehete.healthset.utils.BoundedQueueLinkedList;
+import in.ashnehete.healthset.utils.CustomBluetoothConfiguration;
+import in.ashnehete.healthset.utils.FadeFormatter;
 
-import static in.ashnehete.healthset.AppConstants.ECG_DEVICE_NAME;
+import static in.ashnehete.healthset.AppConstants.BT_DEVICE_NAME;
 import static in.ashnehete.healthset.AppConstants.MESSAGE_READ;
+import static in.ashnehete.healthset.AppConstants.MESSAGE_WRITE;
+import static in.ashnehete.healthset.AppConstants.MY_UUID;
 
 public class EcgActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 10;
     private static final String TAG = "EcgActivity";
-
-    @BindView(R.id.plotEcg)
-    XYPlot plotEcg;
-
-    private List<Integer> plotData = new ArrayList<>();
-    private BluetoothAdapter mBluetoothAdapter = null;
-    private BluetoothDevice mBluetoothDevice = null;
-    private EcgBluetoothService mEcgBluetoothService = null;
-    private Redrawer redrawer;
-    private MyFadeFormatter formatter;
-    private ECGModel ecgSeries;
     @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {
         @Override
@@ -56,23 +49,42 @@ public class EcgActivity extends AppCompatActivity {
                 case MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
+                    Log.d(TAG, "MESSAGE_READ: " + readMessage);
+
                     StringTokenizer stMessage = new StringTokenizer(readMessage);
                     int tokens = stMessage.countTokens();
 
-                    while (stMessage.hasMoreTokens()) {
-                        plotData.add(Integer.parseInt(stMessage.nextToken()));
-                    }
-
-                    if (ecgSeries != null) {
-                        // Sending the latest data
-                        ecgSeries.update(plotData.subList(
-                                plotData.size() - tokens,
-                                plotData.size()
-                        ));
-                    }
+//                    while (stMessage.hasMoreTokens()) {
+//                        plotData.add(Integer.parseInt(stMessage.nextToken()));
+//                    }
+//
+//                    if (ecgModel != null) {
+//                        // Sending the latest data
+//                        ecgModel.update(plotData.subList(
+//                                plotData.size() - tokens,
+//                                plotData.size()
+//                        ));
+//                    }
+                    break;
+                case MESSAGE_WRITE:
+                    byte[] writeBuf = (byte[]) msg.obj;
+                    String writeMessage = new String(writeBuf, 0, msg.arg1);
+                    Log.d(TAG, "MESSAGE_WRITE: " + writeMessage);
+                    break;
             }
         }
     };
+
+    @BindView(R.id.plotEcg)
+    XYPlot plotEcg;
+
+    private List<Integer> plotData = new ArrayList<>();
+    private BluetoothAdapter mBluetoothAdapter = null;
+    private BluetoothService mBluetoothService = null;
+    private BluetoothDevice mBluetoothDevice = null;
+    private Redrawer redrawer;
+    private FadeFormatter formatter;
+    private ECGModel ecgModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,81 +99,52 @@ public class EcgActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         if (!mBluetoothAdapter.isEnabled()) {
-            Log.i(TAG, "onStart enabled");
+            Log.d(TAG, "onStart enabled");
             Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
-        } else if (mEcgBluetoothService == null) {
-            Log.i(TAG, "onStart setupDevice");
+        } else if (mBluetoothService == null) {
+            Log.d(TAG, "onStart setupDevice");
             setupDevice();
         }
         setupGraph();
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        setupDevice();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mEcgBluetoothService != null) {
-            mEcgBluetoothService.stop();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mEcgBluetoothService != null) {
-            mEcgBluetoothService.stop();
-        }
-        redrawer.finish();
-    }
-
     private void setupDevice() {
         Log.i(TAG, "setupDevice");
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
 
-        if (pairedDevices.size() > 0) {
-            for (BluetoothDevice device : pairedDevices) {
-                String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress(); // MAC address
-                Log.i(TAG, deviceName + " " + deviceHardwareAddress);
+        mBluetoothService = CustomBluetoothConfiguration
+                .getBluetoothServiceInstance(getApplicationContext(), MY_UUID);
 
-                if (ECG_DEVICE_NAME.equals(deviceName)) {
-                    mBluetoothDevice = device;
-                    break;
-                }
+        mBluetoothService.setOnEventCallback(new EcgOnEventCallback());
+        mBluetoothService.setOnScanCallback(new EcgOnScanCallback());
+        mBluetoothService.startScan();
+
+        Set<BluetoothDevice> bluetoothDevices = mBluetoothAdapter.getBondedDevices();
+        for (BluetoothDevice bluetoothDevice : bluetoothDevices) {
+            Log.d(TAG, bluetoothDevice.getName());
+            if (BT_DEVICE_NAME.equals(bluetoothDevice.getName())) {
+                Log.d(TAG, "Found: " + bluetoothDevice.getName());
+                mBluetoothDevice = bluetoothDevice;
+                mBluetoothService.connect(bluetoothDevice);
+                mBluetoothService.stopScan();
             }
-        }
-
-        if (mBluetoothDevice != null) {
-            mBluetoothAdapter.cancelDiscovery();
-            if (mEcgBluetoothService == null) {
-                mEcgBluetoothService = new EcgBluetoothService(mBluetoothDevice, mHandler);
-            }
-            mEcgBluetoothService.start();
-        } else {
-            Toast.makeText(this, "Device not found.", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void setupGraph() {
-        ecgSeries = new ECGModel(200, 10);
+        ecgModel = new ECGModel(200, 5);
 
-        formatter = new MyFadeFormatter(200);
+        formatter = new FadeFormatter(200);
         formatter.setLegendIconEnabled(false);
-        plotEcg.addSeries(ecgSeries, formatter);
-        plotEcg.setRangeBoundaries(0, 50, BoundaryMode.FIXED);
+        plotEcg.addSeries(ecgModel, formatter);
+        plotEcg.setRangeBoundaries(0, 1023, BoundaryMode.FIXED);
         plotEcg.setDomainBoundaries(0, 200, BoundaryMode.FIXED);
 
         // reduce the number of range labels
         plotEcg.setLinesPerRangeLabel(3);
 
         // start generating ecg data in the background:
-        ecgSeries.start(new WeakReference<>(plotEcg.getRenderer(AdvancedLineAndPointRenderer.class)));
+        ecgModel.start(new WeakReference<>(plotEcg.getRenderer(AdvancedLineAndPointRenderer.class)));
 
         // set a redraw rate of 30hz and start immediately:
         redrawer = new Redrawer(plotEcg, 30, true);
@@ -179,36 +162,9 @@ public class EcgActivity extends AppCompatActivity {
         }
     }
 
-    public static class MyFadeFormatter extends AdvancedLineAndPointRenderer.Formatter {
-        private int trailSize;
-
-        public MyFadeFormatter(int trailSize) {
-            this.trailSize = trailSize;
-        }
-
-        @Override
-        public Paint getLinePaint(int thisIndex, int latestIndex, int seriesSize) {
-            // offset from the latest index:
-            int offset;
-            if (thisIndex > latestIndex) {
-                offset = latestIndex + (seriesSize - thisIndex);
-            } else {
-                offset = latestIndex - thisIndex;
-            }
-            float scale = 255f / trailSize;
-            int alpha = (int) (255 - (offset * scale));
-            getLinePaint().setAlpha(alpha > 0 ? alpha : 0);
-            return getLinePaint();
-        }
-    }
-
     public static class ECGModel implements XYSeries {
 
         private final BoundedQueueLinkedList<Integer> data;
-        private final long delayMs;
-        private final int blipInteral;
-        //        private final Thread thread;
-        private boolean keepRunning;
         private int latestIndex;
 
         private WeakReference<AdvancedLineAndPointRenderer> rendererRef;
@@ -219,40 +175,11 @@ public class EcgActivity extends AppCompatActivity {
          */
         public ECGModel(int size, int updateFreqHz) {
             data = new BoundedQueueLinkedList<>(size);
-
-            latestIndex = 0;
-
-            // translate hz into delay (ms):
-            delayMs = 1000 / updateFreqHz;
-
-            // add 7 "blips" into the signal:
-            blipInteral = size / 7;
-
-//            thread = new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    if (latestIndex >= data.length) {
-//                        latestIndex = 0;
-//                    }
-//
-//                    // Add plotEcg to data
-//
-//                    if (latestIndex < data.length - 1) {
-//                        // null out the point immediately following i, to disable
-//                        // connecting i and i+1 with a line:
-//                        data[latestIndex + 1] = null;
-//                    }
-//
-//                    if (rendererRef.get() != null) {
-//                        rendererRef.get().setLatestIndex(latestIndex);
-//                    }
-//                    latestIndex++;
-//                }
-//            });
+            latestIndex = data.size();
         }
 
-        public void update(List<Integer> newPlotData) {
-            data.addAll(newPlotData);
+        public void update(int addPoint) {
+            data.add(addPoint);
 
             if (rendererRef.get() != null) {
                 rendererRef.get().setLatestIndex(data.size());
@@ -261,7 +188,6 @@ public class EcgActivity extends AppCompatActivity {
 
         public void start(final WeakReference<AdvancedLineAndPointRenderer> rendererRef) {
             this.rendererRef = rendererRef;
-            keepRunning = true;
         }
 
         @Override
@@ -282,6 +208,60 @@ public class EcgActivity extends AppCompatActivity {
         @Override
         public String getTitle() {
             return "Signal";
+        }
+    }
+
+    public class EcgOnScanCallback implements BluetoothService.OnBluetoothScanCallback {
+
+        @Override
+        public void onDeviceDiscovered(BluetoothDevice bluetoothDevice, int i) {
+            Log.d(TAG, "onDeviceDiscovered: " + bluetoothDevice.toString());
+            if (BT_DEVICE_NAME.equals(bluetoothDevice.getName())) {
+                mBluetoothDevice = bluetoothDevice;
+                mBluetoothService.connect(bluetoothDevice);
+                mBluetoothService.stopScan();
+            }
+        }
+
+        @Override
+        public void onStartScan() {
+            Log.d(TAG, "onStartScan");
+        }
+
+        @Override
+        public void onStopScan() {
+            Log.d(TAG, "onStopScan");
+        }
+    }
+
+    public class EcgOnEventCallback implements BluetoothService.OnBluetoothEventCallback {
+
+        @Override
+        public void onDataRead(byte[] bytes, int i) {
+            Log.d(TAG, "onDataRead: " + new String(bytes, 0, i));
+            // TODO: Add data to plotEcg and plotData
+            String number = new String(bytes, 0, i);
+            ecgModel.update((int) Double.parseDouble(number));
+        }
+
+        @Override
+        public void onStatusChange(BluetoothStatus bluetoothStatus) {
+            Log.d(TAG, "onStatusChange: " + bluetoothStatus.toString());
+        }
+
+        @Override
+        public void onDeviceName(String s) {
+            Log.d(TAG, "onDeviceName: " + s);
+        }
+
+        @Override
+        public void onToast(String s) {
+            Log.d(TAG, "onToast: " + s);
+        }
+
+        @Override
+        public void onDataWrite(byte[] bytes) {
+            Log.d(TAG, "onWrite: " + new String(bytes));
         }
     }
 }
