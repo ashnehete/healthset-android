@@ -1,14 +1,12 @@
 package in.ashnehete.healthset.activites;
 
-import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.androidplot.util.Redrawer;
@@ -18,12 +16,12 @@ import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
+import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothWriter;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,47 +31,12 @@ import in.ashnehete.healthset.utils.CustomBluetoothConfiguration;
 import in.ashnehete.healthset.utils.FadeFormatter;
 
 import static in.ashnehete.healthset.AppConstants.BT_DEVICE_NAME;
-import static in.ashnehete.healthset.AppConstants.MESSAGE_READ;
-import static in.ashnehete.healthset.AppConstants.MESSAGE_WRITE;
 import static in.ashnehete.healthset.AppConstants.MY_UUID;
 
 public class EcgActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 10;
     private static final String TAG = "EcgActivity";
-    @SuppressLint("HandlerLeak")
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
-                    String readMessage = new String(readBuf, 0, msg.arg1);
-                    Log.d(TAG, "MESSAGE_READ: " + readMessage);
-
-                    StringTokenizer stMessage = new StringTokenizer(readMessage);
-                    int tokens = stMessage.countTokens();
-
-//                    while (stMessage.hasMoreTokens()) {
-//                        plotData.add(Integer.parseInt(stMessage.nextToken()));
-//                    }
-//
-//                    if (ecgModel != null) {
-//                        // Sending the latest data
-//                        ecgModel.update(plotData.subList(
-//                                plotData.size() - tokens,
-//                                plotData.size()
-//                        ));
-//                    }
-                    break;
-                case MESSAGE_WRITE:
-                    byte[] writeBuf = (byte[]) msg.obj;
-                    String writeMessage = new String(writeBuf, 0, msg.arg1);
-                    Log.d(TAG, "MESSAGE_WRITE: " + writeMessage);
-                    break;
-            }
-        }
-    };
 
     @BindView(R.id.plotEcg)
     XYPlot plotEcg;
@@ -159,6 +122,26 @@ public class EcgActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Bluetooth Enable Cancelled", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    public void startStream(View view) {
+        Log.d(TAG, "write (e)");
+        try {
+            BluetoothWriter writer = new BluetoothWriter(mBluetoothService);
+            writer.writeln("e");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stopStream(View view) {
+        Log.d(TAG, "write (Q)");
+        try {
+            BluetoothWriter writer = new BluetoothWriter(mBluetoothService);
+            writer.writeln("Q");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
