@@ -1,6 +1,7 @@
 package in.ashnehete.healthset.utils;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -92,5 +93,19 @@ public class BoundedQueueLinkedList<E> extends LinkedList<E> {
     @Override
     public void addLast(E object) {
         add(object);
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer stringBuffer = new StringBuffer();
+        String separator = ",";
+
+        Iterator<E> iterator = this.iterator();
+        while (iterator.hasNext()) {
+            stringBuffer.append(iterator.next().toString());
+            if (iterator.hasNext()) stringBuffer.append(separator);
+        }
+
+        return stringBuffer.toString();
     }
 }

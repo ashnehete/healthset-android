@@ -1,6 +1,7 @@
 package in.ashnehete.healthset.utils;
 
 import android.graphics.Paint;
+import android.support.annotation.ColorInt;
 
 import com.androidplot.xy.AdvancedLineAndPointRenderer;
 
@@ -10,13 +11,17 @@ import com.androidplot.xy.AdvancedLineAndPointRenderer;
 
 public class FadeFormatter extends AdvancedLineAndPointRenderer.Formatter {
     private int trailSize;
+    private int color;
 
-    public FadeFormatter(int trailSize) {
+    public FadeFormatter(int trailSize, @ColorInt int color) {
         this.trailSize = trailSize;
+        this.color = color;
     }
 
     @Override
     public Paint getLinePaint(int thisIndex, int latestIndex, int seriesSize) {
+        getLinePaint().setColor(color);
+
         // offset from the latest index:
         int offset;
         if (thisIndex > latestIndex) {

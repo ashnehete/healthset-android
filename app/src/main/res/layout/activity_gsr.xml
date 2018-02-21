@@ -5,39 +5,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_device"
-    tools:context="in.ashnehete.healthset.activities.TemperatureActivity">
+    tools:context="in.ashnehete.healthset.activities.GsrActivity">
 
     <TextView
-        android:id="@+id/tv_temperature_c"
+        android:id="@+id/tv_gsr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:text="32 °C"
+        android:gravity="center"
+        android:text="1000 kΩ"
         android:textColor="@color/md_white_1000"
         android:textSize="84sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_resistance" />
 
     <TextView
-        android:id="@+id/tv_temperature_f"
+        android:id="@+id/tv_resistance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="89.6 °F"
+        android:layout_marginTop="48dp"
+        android:text="Resistance"
         android:textColor="@color/md_white_1000"
-        android:textSize="48sp"
+        android:textSize="36sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_temperature_c" />
-
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btn_temperature_start"
+        android:id="@+id/btn_gsr_start"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="18dp"
@@ -53,11 +52,11 @@
         android:textColor="@color/md_black_1000"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_temperature_stop"
+        app:layout_constraintEnd_toStartOf="@+id/btn_gsr_stop"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/btn_temperature_stop"
+        android:id="@+id/btn_gsr_stop"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="18dp"
@@ -74,6 +73,5 @@
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btn_temperature_start" />
-
+        app:layout_constraintStart_toEndOf="@+id/btn_gsr_start" />
 </android.support.constraint.ConstraintLayout>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="in.ashnehete.healthset.activites.LauncherActivity">
+    tools:context="in.ashnehete.healthset.activities.LauncherActivity">
 
     <ProgressBar
         android:id="@+id/progressBar2"

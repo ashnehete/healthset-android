@@ -9,7 +9,7 @@ import java.util.UUID;
 public class AppConstants {
     public static final String APP_NAME = "HealthSet";
 
-    public static final String BT_DEVICE_NAME = "H-C-2010-06-01";
+    public static final String BT_DEVICE_NAME = "HC-05";
     public static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     public static final int MESSAGE_STATE_CHANGE = 1;
@@ -22,4 +22,13 @@ public class AppConstants {
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
 
+    //
+    public static final String DATE_FORMAT = "yyyy_MM_dd_HH_mm_ss";
+
+    // Devices
+    public static final String ECG = "ECG";
+    public static final String TEMPERATURE = "TEMPERATURE";
+    public static final String PULSE = "PULSE";
+    public static final String BEND = "BEND";
+    public static final String GSR = "GSR";
 }

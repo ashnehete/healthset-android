@@ -1,4 +1,4 @@
-package in.ashnehete.healthset.activites;
+package in.ashnehete.healthset.activities;
 
 import android.net.Uri;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package in.ashnehete.healthset.activites;
+package in.ashnehete.healthset.activities;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;

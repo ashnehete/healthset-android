@@ -12,8 +12,11 @@ import android.view.ViewGroup;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import in.ashnehete.healthset.R;
-import in.ashnehete.healthset.activites.EcgActivity;
-import in.ashnehete.healthset.activites.TemperatureActivity;
+import in.ashnehete.healthset.activities.BendActivity;
+import in.ashnehete.healthset.activities.EcgActivity;
+import in.ashnehete.healthset.activities.GsrActivity;
+import in.ashnehete.healthset.activities.PulseActivity;
+import in.ashnehete.healthset.activities.TemperatureActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -84,6 +87,24 @@ public class DevicesFragment extends Fragment {
     @OnClick(R.id.btn_device_temperature)
     public void onClickBtnDeviceTemp() {
         Intent intent = new Intent(getContext(), TemperatureActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.btn_device_pulse)
+    public void onClickBtnDevicePulse() {
+        Intent intent = new Intent(getContext(), PulseActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.btn_device_bend)
+    public void onClickBtnDeviceBend() {
+        Intent intent = new Intent(getContext(), BendActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.btn_device_gsr)
+    public void onClickBtnDeviceGsr() {
+        Intent intent = new Intent(getContext(), GsrActivity.class);
         startActivity(intent);
     }
 

@@ -13,35 +13,65 @@
             android:id="@+id/btn_device_ecg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:text="ECG" />
+            android:background="@drawable/button_style"
+            android:text="ECG"
+            android:textColor="@color/md_black_1000"
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/btn_device_temperature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:text="Temperature" />
+            android:background="@drawable/button_style"
+            android:text="Temperature"
+            android:textColor="@color/md_black_1000"
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/btn_device_pulse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:text="Pulse" />
+            android:background="@drawable/button_style"
+            android:text="Pulse"
+            android:textColor="@color/md_black_1000"
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/btn_device_bend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:text="Bend" />
+            android:background="@drawable/button_style"
+            android:text="Bend"
+            android:textColor="@color/md_black_1000"
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/btn_device_gsr"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:text="GSR" />
+            android:background="@drawable/button_style"
+            android:text="GSR"
+            android:textColor="@color/md_black_1000"
+            android:textSize="24sp" />
     </LinearLayout>
 </FrameLayout>

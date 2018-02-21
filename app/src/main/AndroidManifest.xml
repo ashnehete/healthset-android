@@ -14,13 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".activites.EcgActivity"
-            android:label="ECG" />
-        <activity android:name=".activites.LauncherActivity" />
-        <activity
-            android:name=".activites.MainActivity"
-            android:label="@string/app_name">
+        <activity android:name=".activities.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,9 +22,28 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activites.TemperatureActivity"
+            android:name=".activities.MainActivity"
+            android:label="@string/app_name" />
+        <activity
+            android:name=".activities.EcgActivity"
+            android:label="ECG"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.TemperatureActivity"
             android:label="Temperature" />
-        <activity android:name=".activites.TestActivity"></activity>
+        <activity
+            android:name=".activities.GsrActivity"
+            android:label="GSR" />
+        <activity
+            android:name=".activities.PulseActivity"
+            android:label="Pulse" />
+        <activity
+            android:name=".activities.BendActivity"
+            android:label="Bend" />
+        <activity
+            android:name=".activities.TestActivity"
+            android:label="Test" />
     </application>
 
 </manifest>
