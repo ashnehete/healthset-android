@@ -149,10 +149,6 @@ public class EcgActivity extends AppCompatActivity {
 
         // start generating ecg data in the background:
         ecgModel.start(new WeakReference<>(plotEcg.getRenderer(AdvancedLineAndPointRenderer.class)));
-        // For testing
-        for (int i = 0; i < 1000; i++) {
-            ecgModel.update(100);
-        }
 
         // set a redraw rate of 30hz and start immediately:
         redrawer = new Redrawer(plotEcg, 30, true);

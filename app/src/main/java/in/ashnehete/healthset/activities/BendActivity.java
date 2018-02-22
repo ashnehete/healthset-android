@@ -184,6 +184,13 @@ public class BendActivity extends AppCompatActivity {
         @Override
         public void onStatusChange(BluetoothStatus bluetoothStatus) {
             Log.d(TAG, "onStatusChange: " + bluetoothStatus.toString());
+            final String status = bluetoothStatus.toString();
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(BendActivity.this, status, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         @Override

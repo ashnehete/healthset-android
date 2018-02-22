@@ -3,7 +3,6 @@ package in.ashnehete.healthset.activities;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -12,14 +11,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidplot.ui.Size;
-import com.androidplot.ui.SizeMode;
-import com.androidplot.util.Redrawer;
-import com.androidplot.xy.AdvancedLineAndPointRenderer;
-import com.androidplot.xy.BoundaryMode;
-import com.androidplot.xy.XYGraphWidget;
-import com.androidplot.xy.XYPlot;
-import com.androidplot.xy.XYSeries;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothWriter;
@@ -28,18 +19,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import in.ashnehete.healthset.R;
 import in.ashnehete.healthset.models.Record;
-import in.ashnehete.healthset.utils.BoundedQueueLinkedList;
 import in.ashnehete.healthset.utils.CustomBluetoothConfiguration;
-import in.ashnehete.healthset.utils.FadeFormatter;
 
 import static in.ashnehete.healthset.AppConstants.BT_DEVICE_NAME;
 import static in.ashnehete.healthset.AppConstants.GSR;
@@ -53,15 +39,9 @@ public class GsrActivity extends AppCompatActivity {
     @BindView(R.id.tv_gsr)
     TextView tvGsr;
 
-    XYPlot plotGsr;
-
-    private List<Integer> plotData = new ArrayList<>();
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothService mBluetoothService = null;
     private BluetoothDevice mBluetoothDevice = null;
-    private Redrawer redrawer;
-    private FadeFormatter formatter;
-    private EcgActivity.ECGModel ecgModel;
     private Handler mHandler;
     private DatabaseReference mDatabase;
     private FirebaseUser mUser;
@@ -114,7 +94,7 @@ public class GsrActivity extends AppCompatActivity {
             }
         }
     }
-
+/*
     private void setupGraph() {
         plotGsr.getGraph().getGridBackgroundPaint().setColor(Color.BLACK);
         plotGsr.getGraph().getBackgroundPaint().setColor(Color.BLACK);
@@ -145,6 +125,7 @@ public class GsrActivity extends AppCompatActivity {
         // set a redraw rate of 30hz and start immediately:
         redrawer = new Redrawer(plotGsr, 30, true);
     }
+    */
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -186,63 +167,8 @@ public class GsrActivity extends AppCompatActivity {
         mDatabase.child(key).setValue(record);
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        redrawer.finish();
-    }
-
     private void changeUi(String gsr) {
         tvGsr.setText(gsr + " kΩ");
-    }
-
-    public static class ECGModel implements XYSeries {
-
-        private final BoundedQueueLinkedList<Integer> data;
-        private int latestIndex;
-
-        private WeakReference<AdvancedLineAndPointRenderer> rendererRef;
-
-        /**
-         * @param size         Sample size contained within this model
-         * @param updateFreqHz Frequency at which new samples are added to the model
-         */
-        public ECGModel(int size, int updateFreqHz) {
-            data = new BoundedQueueLinkedList<>(size);
-            latestIndex = data.size();
-        }
-
-        public void update(int addPoint) {
-            data.add(addPoint);
-
-            if (rendererRef.get() != null) {
-                rendererRef.get().setLatestIndex(data.size());
-            }
-        }
-
-        public void start(final WeakReference<AdvancedLineAndPointRenderer> rendererRef) {
-            this.rendererRef = rendererRef;
-        }
-
-        @Override
-        public int size() {
-            return data.size();
-        }
-
-        @Override
-        public Number getX(int index) {
-            return index;
-        }
-
-        @Override
-        public Number getY(int index) {
-            return data.get(index);
-        }
-
-        @Override
-        public String getTitle() {
-            return "Signal";
-        }
     }
 
     public class EcgOnScanCallback implements BluetoothService.OnBluetoothScanCallback {
