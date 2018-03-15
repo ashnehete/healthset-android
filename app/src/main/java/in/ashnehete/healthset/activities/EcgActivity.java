@@ -35,8 +35,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import butterknife.BindView;
@@ -59,7 +57,6 @@ public class EcgActivity extends AppCompatActivity {
     @BindView(R.id.plotEcg)
     XYPlot plotEcg;
 
-    private List<Integer> plotData = new ArrayList<>();
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothService mBluetoothService = null;
     private BluetoothDevice mBluetoothDevice = null;
