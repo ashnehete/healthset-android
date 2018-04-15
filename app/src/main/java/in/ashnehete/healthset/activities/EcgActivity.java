@@ -233,6 +233,7 @@ public class EcgActivity extends AppCompatActivity {
         }
 
         public void update(int point) {
+            Log.i(TAG, "update: " + point);
             data.add(point);
 
             if (rendererRef.get() != null) {
