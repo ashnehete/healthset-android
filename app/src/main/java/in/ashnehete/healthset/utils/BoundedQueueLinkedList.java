@@ -11,9 +11,10 @@ import java.util.LinkedList;
 public class BoundedQueueLinkedList<E> extends LinkedList<E> {
 
     private final int maxSize;
-
+    private int front;
     public BoundedQueueLinkedList(int maxSize) {
         this.maxSize = maxSize;
+        this.front = 0;
     }
 
     /*
@@ -23,8 +24,9 @@ public class BoundedQueueLinkedList<E> extends LinkedList<E> {
      */
     @Override
     public boolean add(E object) {
-        if (size() == maxSize) {
-            removeFirst();
+        if (size() - front == maxSize) {
+//            removeFirst();
+            front++;
         }
         return super.add(object);
     }
@@ -50,12 +52,13 @@ public class BoundedQueueLinkedList<E> extends LinkedList<E> {
      */
     @Override
     public boolean addAll(Collection<? extends E> collection) {
-        final int totalNeededSize = size() + collection.size();
-        final int overhead = totalNeededSize - maxSize;
-        if (overhead > 0) {
-            removeRange(0, overhead);
-        }
-        return super.addAll(collection);
+//        final int totalNeededSize = size() + collection.size();
+//        final int overhead = totalNeededSize - maxSize;
+//        if (overhead > 0) {
+//            removeRange(0, overhead);
+//        }
+//        return super.addAll(collection);
+        throw new UnsupportedOperationException();
     }
 
     /*
@@ -93,6 +96,11 @@ public class BoundedQueueLinkedList<E> extends LinkedList<E> {
     @Override
     public void addLast(E object) {
         add(object);
+    }
+
+    @Override
+    public int size() {
+        return (super.size() < this.maxSize) ? super.size() : maxSize;
     }
 
     @Override
