@@ -9,7 +9,7 @@ import java.util.UUID;
 public class AppConstants {
     public static final String APP_NAME = "HealthSet";
 
-    public static final String BT_DEVICE_NAME = "H-C-2010-06-01";
+    public static final String BT_DEVICE_NAME = "HC-05";
     public static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     public static final int MESSAGE_STATE_CHANGE = 1;

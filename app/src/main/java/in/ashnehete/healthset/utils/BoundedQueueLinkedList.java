@@ -12,6 +12,7 @@ public class BoundedQueueLinkedList<E> extends LinkedList<E> {
 
     private final int maxSize;
     private int front;
+
     public BoundedQueueLinkedList(int maxSize) {
         this.maxSize = maxSize;
         this.front = 0;
@@ -100,7 +101,12 @@ public class BoundedQueueLinkedList<E> extends LinkedList<E> {
 
     @Override
     public int size() {
-        return (super.size() < this.maxSize) ? super.size() : maxSize;
+        return super.size() - front;
+    }
+
+    @Override
+    public E get(int index) {
+        return super.get(front + index);
     }
 
     @Override

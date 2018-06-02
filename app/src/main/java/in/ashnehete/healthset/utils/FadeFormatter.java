@@ -23,15 +23,15 @@ public class FadeFormatter extends AdvancedLineAndPointRenderer.Formatter {
         getLinePaint().setColor(color);
 
         // offset from the latest index:
-        int offset;
-        if (thisIndex > latestIndex) {
-            offset = latestIndex + (seriesSize - thisIndex);
-        } else {
-            offset = latestIndex - thisIndex;
-        }
-        float scale = 255f / trailSize;
-        int alpha = (int) (255 - (offset * scale));
-        getLinePaint().setAlpha(alpha > 0 ? alpha : 0);
+//        int offset;
+//        if (thisIndex > latestIndex) {
+//            offset = latestIndex + (seriesSize - thisIndex);
+//        } else {
+//            offset = latestIndex - thisIndex;
+//        }
+//        float scale = 255f / trailSize;
+//        int alpha = (int) (255 - (offset * scale));
+//        getLinePaint().setAlpha(alpha > 0 ? alpha : 0);
         return getLinePaint();
     }
 }

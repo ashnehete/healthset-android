@@ -138,7 +138,7 @@ public class EcgActivity extends AppCompatActivity {
         formatter.setLegendIconEnabled(false);
         formatter.setPointLabelFormatter(null);
         plotEcg.addSeries(ecgModel, formatter);
-        plotEcg.setRangeBoundaries(0, 700, BoundaryMode.FIXED);
+        plotEcg.setRangeBoundaries(0, 800, BoundaryMode.FIXED);
         plotEcg.setDomainBoundaries(0, 1200, BoundaryMode.FIXED);
 
         // reduce the number of range labels

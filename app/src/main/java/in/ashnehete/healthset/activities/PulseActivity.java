@@ -109,10 +109,10 @@ public class PulseActivity extends AppCompatActivity {
     }
 
     public void startStream(View view) {
-        Log.d(TAG, "write (g)");
+        Log.d(TAG, "write (b)");
         try {
             BluetoothWriter writer = new BluetoothWriter(mBluetoothService);
-            writer.writeln("g");
+            writer.writeln("b");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -137,7 +137,7 @@ public class PulseActivity extends AppCompatActivity {
     }
 
     private void changeUi(String pulse) {
-        tvPulse.setText(pulse.concat(" bpm"));
+        tvPulse.setText(pulse);
     }
 
     public class OnScanCallback implements BluetoothService.OnBluetoothScanCallback {
