@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,10 +35,14 @@ import static in.ashnehete.healthset.AppConstants.MY_UUID;
 public class GsrActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 10;
-    private static final String TAG = "EcgActivity";
+    private static final String TAG = "GsrActivity";
 
     @BindView(R.id.tv_gsr)
     TextView tvGsr;
+    @BindView(R.id.btn_gsr_start)
+    Button btnGsrStart;
+    @BindView(R.id.btn_gsr_stop)
+    Button btnGsrStop;
 
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothService mBluetoothService = null;
@@ -57,6 +62,20 @@ public class GsrActivity extends AppCompatActivity {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference()
                 .child("records").child(mUser.getUid());
+
+        enableButton(false);
+    }
+
+    private void enableButton(boolean enabled) {
+        btnGsrStart.setEnabled(enabled);
+        btnGsrStop.setEnabled(enabled);
+        if (enabled) {
+            btnGsrStart.setTextColor(getResources().getColor(R.color.ap_charcoal));
+            btnGsrStop.setTextColor(getResources().getColor(R.color.ap_charcoal));
+        } else {
+            btnGsrStart.setTextColor(getResources().getColor(R.color.md_grey_400));
+            btnGsrStop.setTextColor(getResources().getColor(R.color.md_grey_400));
+        }
     }
 
     @Override
@@ -211,13 +230,16 @@ public class GsrActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onStatusChange(BluetoothStatus bluetoothStatus) {
+        public void onStatusChange(final BluetoothStatus bluetoothStatus) {
             Log.d(TAG, "onStatusChange: " + bluetoothStatus.toString());
             final String status = bluetoothStatus.toString();
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(GsrActivity.this, status, Toast.LENGTH_SHORT).show();
+                    if (bluetoothStatus == BluetoothStatus.CONNECTED) {
+                        enableButton(true);
+                    }
                 }
             });
         }

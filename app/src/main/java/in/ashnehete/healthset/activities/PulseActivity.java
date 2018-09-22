@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +41,10 @@ public class PulseActivity extends AppCompatActivity {
 
     @BindView(R.id.tv_pulse)
     TextView tvPulse;
+    @BindView(R.id.btn_pulse_start)
+    Button btnPulseStart;
+    @BindView(R.id.btn_pulse_stop)
+    Button btnPulseStop;
 
     private List<Integer> plotData = new ArrayList<>();
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -59,6 +64,20 @@ public class PulseActivity extends AppCompatActivity {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference()
                 .child("records").child(mUser.getUid());
+
+        enableButton(false);
+    }
+
+    private void enableButton(boolean enabled) {
+        btnPulseStart.setEnabled(enabled);
+        btnPulseStop.setEnabled(enabled);
+        if (enabled) {
+            btnPulseStart.setTextColor(getResources().getColor(R.color.ap_charcoal));
+            btnPulseStop.setTextColor(getResources().getColor(R.color.ap_charcoal));
+        } else {
+            btnPulseStart.setTextColor(getResources().getColor(R.color.md_grey_400));
+            btnPulseStop.setTextColor(getResources().getColor(R.color.md_grey_400));
+        }
     }
 
     @Override
@@ -180,13 +199,16 @@ public class PulseActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onStatusChange(BluetoothStatus bluetoothStatus) {
+        public void onStatusChange(final BluetoothStatus bluetoothStatus) {
             Log.d(TAG, "onStatusChange: " + bluetoothStatus.toString());
             final String status = bluetoothStatus.toString();
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(PulseActivity.this, status, Toast.LENGTH_SHORT).show();
+                    if (bluetoothStatus == BluetoothStatus.CONNECTED) {
+                        enableButton(true);
+                    }
                 }
             });
         }

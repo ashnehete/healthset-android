@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,10 @@ public class TemperatureActivity extends AppCompatActivity {
     TextView tvTempC;
     @BindView(R.id.tv_temperature_f)
     TextView tvTempF;
+    @BindView(R.id.btn_temperature_start)
+    Button btnTempStart;
+    @BindView(R.id.btn_temperature_stop)
+    Button btnTempStop;
 
     private List<Integer> plotData = new ArrayList<>();
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -61,6 +66,20 @@ public class TemperatureActivity extends AppCompatActivity {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference()
                 .child("records").child(mUser.getUid());
+
+        enableButton(false);
+    }
+
+    private void enableButton(boolean enabled) {
+        btnTempStart.setEnabled(enabled);
+        btnTempStop.setEnabled(enabled);
+        if (enabled) {
+            btnTempStart.setTextColor(getResources().getColor(R.color.ap_charcoal));
+            btnTempStop.setTextColor(getResources().getColor(R.color.ap_charcoal));
+        } else {
+            btnTempStart.setTextColor(getResources().getColor(R.color.md_grey_400));
+            btnTempStop.setTextColor(getResources().getColor(R.color.md_grey_400));
+        }
     }
 
     @Override
@@ -185,13 +204,16 @@ public class TemperatureActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onStatusChange(BluetoothStatus bluetoothStatus) {
+        public void onStatusChange(final BluetoothStatus bluetoothStatus) {
             Log.d(TAG, "onStatusChange: " + bluetoothStatus.toString());
             final String status = bluetoothStatus.toString();
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(TemperatureActivity.this, status, Toast.LENGTH_SHORT).show();
+                    if (bluetoothStatus == BluetoothStatus.CONNECTED) {
+                        enableButton(true);
+                    }
                 }
             });
         }

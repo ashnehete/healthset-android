@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.androidplot.ui.Size;
@@ -56,6 +57,10 @@ public class EcgActivity extends AppCompatActivity {
 
     @BindView(R.id.plotEcg)
     XYPlot plotEcg;
+    @BindView(R.id.btn_ecg_start)
+    Button btnEcgStart;
+    @BindView(R.id.btn_ecg_stop)
+    Button btnEcgStop;
 
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothService mBluetoothService = null;
@@ -79,7 +84,19 @@ public class EcgActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference()
                 .child("records").child(mUser.getUid());
 
+        enableButton(false);
+    }
 
+    private void enableButton(boolean enabled) {
+        btnEcgStart.setEnabled(enabled);
+        btnEcgStop.setEnabled(enabled);
+        if (enabled) {
+            btnEcgStart.setTextColor(getResources().getColor(R.color.ap_charcoal));
+            btnEcgStop.setTextColor(getResources().getColor(R.color.ap_charcoal));
+        } else {
+            btnEcgStart.setTextColor(getResources().getColor(R.color.md_grey_400));
+            btnEcgStop.setTextColor(getResources().getColor(R.color.md_grey_400));
+        }
     }
 
     @Override
@@ -188,7 +205,7 @@ public class EcgActivity extends AppCompatActivity {
         final Record record = new Record(ECG);
         String filename = mUser.getUid() + "_" + record.getTimestamp() + ".txt";
 
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference()
+        final StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 .child("ECG").child(filename);
         storageReference.putBytes(ecgModel.getDataString().getBytes()).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -199,12 +216,14 @@ public class EcgActivity extends AppCompatActivity {
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-                record.setValue(downloadUrl.toString());
-                String key = mDatabase.push().getKey();
-                mDatabase.child(key).setValue(record);
+                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        record.setValue(uri.toString());
+                        String key = mDatabase.push().getKey();
+                        mDatabase.child(key).setValue(record);
+                    }
+                });
             }
         });
     }
@@ -303,13 +322,16 @@ public class EcgActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onStatusChange(BluetoothStatus bluetoothStatus) {
+        public void onStatusChange(final BluetoothStatus bluetoothStatus) {
             Log.d(TAG, "onStatusChange: " + bluetoothStatus.toString());
             final String status = bluetoothStatus.toString();
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(EcgActivity.this, status, Toast.LENGTH_SHORT).show();
+                    if (bluetoothStatus == BluetoothStatus.CONNECTED) {
+                        enableButton(true);
+                    }
                 }
             });
         }
